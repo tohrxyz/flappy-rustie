@@ -82,17 +82,35 @@ fn main() {
         );
 
         gtk::main_iteration();
-
-        window.connect_key_press_event(|window, event| {
+        
+        window.connect_key_press_event(move |window, event| {
             let pressed_key = event.get_keycode().unwrap() as u32;
             let key = Key::from(pressed_key);
             let space = Key::from(49);
-
+            
             if key == space {
                 println!("Space pressed");
+                
+                let draw_area = window.get_children()[0].clone().downcast::<DrawingArea>().unwrap();
+                println!("draw_area: {:?}", draw_area);
+                
+                draw_area.connect_draw(move |draw_area, context| {
+                    println!("draw_area.connect_draw");
+                    context.set_source_rgb(0.0, 0.0, 0.0); // Set color (black in this case)
+                    context.rectangle(
+                        300.0, 
+                        200.0,
+                        PLAYER_DIMENSIONS.width as f64, 
+                        PLAYER_DIMENSIONS.height as f64
+                    ); // Create a rectangle
+                    context.fill(); // Fill the rectangle
+        
+                    Inhibit(false)
+                });
+                
             }
             
-            println!("Key pressed: {:?}", key);
+            // println!("Key pressed: {:?}", key);
             gtk::Inhibit(false)
         });
 
